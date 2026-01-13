@@ -1,0 +1,308 @@
+{
+  "name": "Vision-agent",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://ollama:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"granite3.2-vision:2b\",\n  \"prompt\": \"{{ $json.body?.message || 'Describe this image' }}\",\n  \"images\": [\"{{ $json.image_base64 }}\"],\n  \"stream\": false\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        192,
+        -256
+      ],
+      "id": "ed3de6a4-bae9-464c-a1fb-1edacc2c4a94",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai-chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -528,
+        -176
+      ],
+      "id": "f4cdb85f-cde5-4afb-b2d0-4ecece4d70ee",
+      "name": "Webhook",
+      "webhookId": "3f0738bc-6736-4d68-a4fb-191c1398bb99"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3e4242b0-3708-421c-9b75-488e95f7b068",
+              "leftValue": "={{ !!$binary?.file }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -304,
+        32
+      ],
+      "id": "a8949a69-8015-46ca-a80f-dd70f7bf076b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "binaryPropertyName": "file",
+        "destinationKey": "image_base64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        -256
+      ],
+      "id": "dfc9a9df-31ce-4063-9b07-aabbc0d0e85c",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://ollama:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"granite3.2-vision:2b\",\n  \"prompt\": \"{{ $json.body?.message || $json.message }}\",\n  \"stream\": false\n}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -32,
+        48
+      ],
+      "id": "b71be23b-0a8b-493a-b2bf-4c93fc0dfb20",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0d0c7b8e-2cb9-45fb-a878-1fd0dc6c0733",
+              "name": "text",
+              "value": "={{ $json.response }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        496,
+        -144
+      ],
+      "id": "e3c37023-2834-4abd-95f7-92da4ea47cef",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.text }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        768,
+        -336
+      ],
+      "id": "3082fdeb-7592-4ed4-8551-dc26805d90bc",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.body?.email || $json.email }}",
+        "subject": "AI Generated Message",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        992,
+        -144
+      ],
+      "id": "fadff146-7933-4a9d-825c-763e44fbf99b",
+      "name": "Send a message",
+      "webhookId": "3bf44977-4e9b-43a6-9837-83bbd8a4c1e0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6F4gmWIqWmg8x1Pk",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "55c2ae68-2937-4c67-80d1-64177b14863a",
+              "leftValue": "={{ !!$json.body?.email || !!$json.email }}\n",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        752,
+        48
+      ],
+      "id": "4fa60eb6-f816-44f7-a4a0-b02f12c92c41",
+      "name": "If1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "728958d1-fb32-41b3-8877-e6cdd044435c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "19f01f329d88e05c3ea1812607b1018d080914e009959d6a7045e2188eac081b"
+  },
+  "id": "l0nBQddozxJ8TDV2",
+  "tags": []
+}
