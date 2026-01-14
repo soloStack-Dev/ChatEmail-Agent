@@ -60,15 +60,15 @@ Ollama LLM   Ollama Vision
 
 ![Trae AI assistant IDE](https://i.ibb.co/bMmpwRBy/Screenshot-2026-01-13-191853.png)
 
-------------------------- [] Trae Ai assistant IDE for future --------------------
+------------------------- [] Trae Ai assistant IDE for future [] --------------------
 
 ![Docker runtime Desktop](https://i.ibb.co/spmrPW8r/Screenshot-2026-01-13-184934.png)
 
--------------------------- [] Docker Desktop Running the Container -------------------
+-------------------------- [] Docker Desktop Running the Container [] -------------------
 
 ![Postman Testing api](https://i.ibb.co/C5qrJ4Mm/Screenshot-2026-01-13-184818.png)
 
-------------------------------- [] Postman Testing Api ----------------------------
+------------------------------- [] Postman Testing Api [] ----------------------------
 
 This workflow i build for i showcase for i have a knowledge to how to use the ai automation tool workflow 
 build ai agents.
